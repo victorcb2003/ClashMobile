@@ -1,0 +1,68 @@
+import { useState } from "react"
+import { login } from "../services/authService"
+import { Alert, Pressable, View, Text, TextInput } from "react-native"
+import { styles } from "../style/login.style"
+
+export default function Login() {
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+
+    const handleSubmit = async () => {
+        try {
+            await login({
+                email: email,
+                password: password,
+            })
+        } catch (error) {
+            Alert.alert("Connexion", "Erreur lors de la connexion.")
+            console.error(error)
+        }
+    }
+
+    return (
+        <View style={styles.container}>
+            <View style={styles.backgroundLayer} />
+
+            <View style={styles.foreground}>
+                <View style={styles.card}>
+                    <Text style={styles.title}>Connexion</Text>
+
+                    <View style={styles.fieldGroup}>
+                        <Text style={styles.label}>Email</Text>
+                        <TextInput
+                            value={email}
+                            onChangeText={setEmail}
+                            style={styles.input}
+                            placeholder="Email..."
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            textContentType="emailAddress"
+                            autoComplete="email"
+                        />
+                    </View>
+
+                    <View style={styles.fieldGroup}>
+                        <Text style={styles.label}>Mot de passe</Text>
+                        <TextInput
+                            secureTextEntry
+                            value={password}
+                            onChangeText={setPassword}
+                            style={styles.input}
+                            placeholder="Mot de passe..."
+                        />
+                    </View>
+
+                    <View style={styles.buttonRow}>
+                        <Pressable
+                            style={styles.button}
+                            onPress={handleSubmit}
+                        >
+                            <Text style={styles.buttonText}>Se connecter</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </View>
+        </View>
+    )
+}

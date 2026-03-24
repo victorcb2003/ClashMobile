@@ -5,10 +5,9 @@ axios.defaults.withCredentials = true
 export const getUser = async () => {
     try {
         const response = await axios.get(`${baseUrl}/user/me`)
-        console.log(response)
         return response.data
     } catch (error) {
-        console.error("Erreur lors de la récupération du user :", error)
+        console.log("Erreur lors de la récupération du user :", error)
     }
 }
 
@@ -29,8 +28,7 @@ export const login = async (data) => {
         console.log(response.data)
         return response.data
     } catch (error) {
-        console.error("Erreur lors de la connexion :", error)
-        throw error
+        console.log("Erreur lors de la connexion :", error)
     }
 }
 

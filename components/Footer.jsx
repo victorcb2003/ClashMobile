@@ -8,14 +8,12 @@ export default function Footer() {
 
     useEffect(()=>{
         (async ()=>{
-            console.log(getUser)
             const user = await getUser()
-            console.log(user)
         })()
-    })
+    },[])
 
   return (
-    <View>
+    <View className="absolute bottom-0 w-full h-10 bg-green-500">
 
     </View>
   )
