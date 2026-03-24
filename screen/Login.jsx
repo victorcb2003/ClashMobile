@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { login } from "../services/authService"
-import { Alert, Pressable, View, Text, TextInput } from "react-native"
+import { Alert, Pressable, View, Text, TextInput,Image } from "react-native"
 import { styles } from "../style/login.style"
 
 export default function Login() {
@@ -21,7 +21,9 @@ export default function Login() {
 
     return (
         <View style={styles.container}>
-            <View style={styles.backgroundLayer} />
+            <View style={styles.backgroundLayer}>
+                <Image source={require('../assets/Pelouse.png')} style={{ height:'100%',width:"100%" }}/>
+            </View>
 
             <View style={styles.foreground}>
                 <View style={styles.card}>

@@ -1,7 +1,9 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Login from "./screen/Login"
+import Register from './screen/Register';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -39,21 +41,24 @@ function MyTabBar({ state, descriptors, navigation }) {
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        tabBar={(props) => <MyTabBar {...props} />} // 👈 custom
-        screenOptions={{
-          swipeEnabled: true,
-        }}
-      >
-        <Tab.Screen name="Login">
-          {() => <Login/>}
-        </Tab.Screen>
-        <Tab.Screen name="Login2">
-          {() => <Login/>}
-        </Tab.Screen>
-      </Tab.Navigator>
-    </NavigationContainer>
+
+    <SafeAreaView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <Tab.Navigator
+          tabBar={(props) => <MyTabBar {...props} />} // 👈 custom
+          screenOptions={{
+            swipeEnabled: true,
+          }}
+        >
+          <Tab.Screen name="Login">
+            {() => <Login />}
+          </Tab.Screen>
+          <Tab.Screen name="Inscription">
+            {() => <Register />}
+          </Tab.Screen>
+        </Tab.Navigator>
+      </NavigationContainer>
+    </SafeAreaView>
   );
 }
 

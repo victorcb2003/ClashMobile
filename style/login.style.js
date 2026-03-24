@@ -64,7 +64,6 @@ export const styles = StyleSheet.create({
 		alignItems: "flex-end",
 	},
 	button: {
-		width: "40%",
 		borderRadius: 6,
 		paddingHorizontal: 16,
 		paddingVertical: 8,
