@@ -2,12 +2,37 @@ const baseUrl = "https://clashofleagues.fr/api"
 import axios from "axios"
 axios.defaults.withCredentials = true
 
+const logAxiosError = (label, error, ignoredStatuses = []) => {
+    const status = error?.response?.status
+    const isIgnoredStatus = ignoredStatuses.includes(status)
+
+    if (isIgnoredStatus) {
+        return
+    }
+
+    if (error?.response) {
+        console.log(`${label} [HTTP ${status}]`, error.response?.data)
+        return
+    }
+
+    if (error?.request) {
+        console.log(`${label} [Network Error]`, error.message)
+        return
+    }
+
+    console.log(label, error?.message || error)
+}
+
 export const getUser = async () => {
     try {
         const response = await axios.get(`${baseUrl}/user/me`)
         return response.data
     } catch (error) {
-        console.log("Erreur lors de la récupération du user :", error)
+        logAxiosError("Erreur lors de la récupération du user :", error, [401])
+        if (error?.response?.status === 401) {
+            return null
+        }
+        throw error
     }
 }
 
@@ -25,10 +50,10 @@ export const formSignUp = async (data) => {
 export const login = async (data) => {
     try {
         const response = await axios.post(`${baseUrl}/user/login`, data)
-        console.log(response.data)
         return response.data
     } catch (error) {
-        console.log("Erreur lors de la connexion :", error)
+        logAxiosError("Erreur lors de la connexion :", error)
+        throw error
     }
 }
 

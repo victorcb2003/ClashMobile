@@ -1,19 +1,34 @@
 import { useState } from "react"
-import { login } from "../services/authService"
+import { useAuth } from "../context/AuthProvider"
 import { Alert, Pressable, View, Text, TextInput,Image } from "react-native"
 import { styles } from "../style/login.style"
 
-export default function Login() {
+export default function Login({ onLoginSuccess }) {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const { authLogin } = useAuth()
 
     const handleSubmit = async () => {
         try {
-            await login({
+            const result = await authLogin({
                 email: email,
                 password: password,
             })
+
+            if (!result) {
+                Alert.alert("Connexion", "Identifiants invalides.")
+            }
         } catch (error) {
+            if (error?.response?.status === 401) {
+                Alert.alert("Connexion", "Identifiants invalides.")
+                return
+            }
+
+            if (!error?.response) {
+                Alert.alert("Connexion", "Impossible de joindre le serveur. Vérifie ta connexion réseau.")
+                return
+            }
+
             Alert.alert("Connexion", "Erreur lors de la connexion.")
             console.error(error)
         }
