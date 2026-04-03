@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Alert, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Alert, FlatList, Pressable, Text, TextInput, View } from 'react-native'
 import { getMatchById, updateMatch } from '../services/matchService'
 import { infoEquipe } from '../services/equipeService'
 import { findTournoisById } from '../services/tournoisService'
 import { createBut, deleteBut, getButByMatch } from '../services/butService'
 import { getUser } from '../services/authService'
+import { styles } from '../style/matchDisplay.style'
 
 export default function MatchDisplay({ route }) {
     const matchId = route?.params?.id
@@ -125,7 +126,7 @@ export default function MatchDisplay({ route }) {
                         )}
                     />
                     <TextInput placeholder="Minute" value={minute} onChangeText={setMinute} keyboardType="numeric" style={styles.input} />
-                    <View style={{ flexDirection: 'row', marginBottom: 8 }}>
+                    <View style={styles.typeRow}>
                         <Pressable style={[styles.pill, typeBut === '0' && styles.pillSelected]} onPress={() => setTypeBut('0')}><Text>Normal</Text></Pressable>
                         <Pressable style={[styles.pill, typeBut === '1' && styles.pillSelected]} onPress={() => setTypeBut('1')}><Text>Penalty</Text></Pressable>
                     </View>
@@ -139,7 +140,7 @@ export default function MatchDisplay({ route }) {
                 keyExtractor={(item) => String(item.id)}
                 renderItem={({ item }) => (
                     <View style={styles.butRow}>
-                        <View style={{ flex: 1 }}>
+                        <View style={styles.butInfo}>
                             <Text style={styles.butName}>{getPlayerName(item.User_id)}</Text>
                             <Text style={styles.butSub}>{item.Type_But ? 'Penalty' : 'Normal'}</Text>
                         </View>
@@ -154,25 +155,6 @@ export default function MatchDisplay({ route }) {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    container: { flex: 1, padding: 16, backgroundColor: '#0f172a' },
-    center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    title: { color: '#fff', fontSize: 24, fontWeight: '700' },
-    sub: { color: '#cbd5e1', marginTop: 4 },
-    score: { color: '#fff', fontSize: 36, fontWeight: '800', marginVertical: 8 },
-    card: { backgroundColor: '#1e293b', borderRadius: 10, padding: 12, marginTop: 10 },
-    section: { color: '#fff', fontSize: 16, fontWeight: '700', marginVertical: 8 },
-    input: { backgroundColor: '#fff', borderRadius: 8, padding: 10, marginBottom: 8 },
-    btn: { backgroundColor: '#166534', borderRadius: 8, padding: 10, alignItems: 'center' },
-    btnDanger: { backgroundColor: '#b91c1c', borderRadius: 8, padding: 10, alignItems: 'center' },
-    btnText: { color: '#fff', fontWeight: '700' },
-    pill: { backgroundColor: '#fff', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6, marginRight: 6 },
-    pillSelected: { backgroundColor: '#86efac' },
-    butRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1e293b', borderRadius: 10, padding: 10, marginBottom: 8 },
-    butName: { color: '#fff', fontWeight: '700' },
-    butSub: { color: '#cbd5e1' },
-})
 
 /* function LegacyMatchDisplayWeb() {
 

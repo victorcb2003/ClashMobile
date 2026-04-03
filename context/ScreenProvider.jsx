@@ -1,36 +1,57 @@
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from './AuthProvider';
+import { styles } from '../style/screenProvider.style';
 import Login from '../screen/Login'
 import Register from '../screen/Register';
 import Home from '../screen/Home';
 import Tournois from '../screen/Tournois';
 import Match from '../screen/Match';
 import Equipe from '../screen/Equipe';
+import MatchDisplay from '../screen/MatchDisplay';
+import EquipeDisplay from '../screen/EquipeDisplay';
 import Profil from '../screen/Profil';
 import Admin from '../screen/Admin';
 import Calendrier from '../screen/Calendrier';
 
 const Tab = createMaterialTopTabNavigator();
 
-// 👇 Custom Tab Bar en bas
-function MyTabBar({ state, navigation }) {
+const routeIcons = {
+  Login: 'login',
+  Inscription: 'person-add',
+  Home: 'home',
+  Tournois: 'emoji-events',
+  Match: 'sports-soccer',
+  Equipe: 'groups',
+  Profil: 'person',
+  Calendrier: 'calendar-today',
+  Admin: 'admin-panel-settings',
+}
+
+function MyTabBar({ state, descriptors, navigation }) {
+  const visibleRoutes = state.routes.filter((route) => descriptors[route.key]?.options?.tabBarVisible !== false)
+
   return (
     <View style={styles.tabBar}>
-      {state.routes.map((route, index) => {
-        const isFocused = state.index === index;
+      {visibleRoutes.map((route) => {
+        const routeIndex = state.routes.findIndex((r) => r.key === route.key)
+        const isFocused = state.index === routeIndex;
+        const iconName = routeIcons[route.name] || 'circle';
 
         return (
           <TouchableOpacity
             key={route.key}
             onPress={() => navigation.navigate(route.name)}
-            style={styles.tabItem}
+            style={[styles.tabItem, isFocused && styles.tabItemActive]}
           >
-            <Text style={{ color: isFocused ? 'black' : 'gray' }}>
-              {route.name}
-            </Text>
+            <MaterialIcons
+              name={iconName}
+              size={22}
+              color={isFocused ? '#14532d' : '#64748b'}
+            />
           </TouchableOpacity>
         );
       })}
@@ -71,33 +92,19 @@ export default function ScreenProvider() {
             <Tab.Screen name="Profil" component={Profil} />
             <Tab.Screen name="Calendrier" component={Calendrier} />
             {isAdmin && <Tab.Screen name="Admin" component={Admin} />}
+            <Tab.Screen
+              name="MatchDisplay"
+              component={MatchDisplay}
+              options={{ tabBarVisible: false, swipeEnabled: false }}
+            />
+            <Tab.Screen
+              name="EquipeDisplay"
+              component={EquipeDisplay}
+              options={{ tabBarVisible: false, swipeEnabled: false }}
+            />
           </>
         )}
       </Tab.Navigator>
     </NavigationContainer>
   )
 }
-
-const styles = StyleSheet.create({
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tabBar: {
-    flexDirection: 'row',
-    height: 60,
-    borderTopWidth: 1,
-    borderColor: '#ccc',
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    backgroundColor: 'white',
-    zIndex: 99,
-  },
-  tabItem: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});

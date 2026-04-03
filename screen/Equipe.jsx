@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
-import { Alert, FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native"
+import { Alert, FlatList, Pressable, Text, TextInput, View } from "react-native"
 import { createEquipe, findAllEquipe } from "../services/equipeService"
 import { getUser } from "../services/authService"
+import { styles } from "../style/equipe.style"
 
 export default function Equipe({ navigation }) {
     const [equipes, setEquipes] = useState([])
@@ -73,18 +74,3 @@ export default function Equipe({ navigation }) {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    container: { flex: 1, padding: 16, backgroundColor: "#0f172a" },
-    title: { color: "#fff", fontSize: 24, fontWeight: "700", marginBottom: 12 },
-    card: { backgroundColor: "#1e293b", borderRadius: 10, padding: 12, marginBottom: 12 },
-    input: { backgroundColor: "#fff", borderRadius: 8, padding: 10, marginBottom: 10 },
-    rowBtns: { flexDirection: "row", justifyContent: "flex-end" },
-    btn: { backgroundColor: "#166534", borderRadius: 8, paddingHorizontal: 14, paddingVertical: 10, alignItems: "center" },
-    btnText: { color: "#fff", fontWeight: "700" },
-    btnGhost: { borderWidth: 1, borderColor: "#94a3b8", borderRadius: 8, paddingHorizontal: 14, paddingVertical: 10, marginRight: 8, backgroundColor: "#fff" },
-    item: { backgroundColor: "#1e293b", borderRadius: 10, padding: 12, marginBottom: 8 },
-    itemTitle: { color: "#fff", fontWeight: "700" },
-    itemSub: { color: "#cbd5e1" },
-    empty: { color: "#cbd5e1" },
-})

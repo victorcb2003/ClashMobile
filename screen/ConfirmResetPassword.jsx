@@ -1,6 +1,7 @@
 import { useState } from "react"
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native"
+import { Alert, Pressable, Text, TextInput, View } from "react-native"
 import { confirmResetPassword } from "../services/authService"
+import { styles } from "../style/confirmResetPassword.style"
 
 function ConfirmResetPassword({ navigation, route }) {
   const [password, setPassword] = useState("")
@@ -41,13 +42,5 @@ function ConfirmResetPassword({ navigation, route }) {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, justifyContent: "center", backgroundColor: "#0f172a" },
-  title: { color: "#fff", fontSize: 24, fontWeight: "700", marginBottom: 12 },
-  input: { backgroundColor: "#fff", borderRadius: 8, padding: 10, marginBottom: 10 },
-  button: { backgroundColor: "#166534", borderRadius: 8, padding: 12, alignItems: "center" },
-  buttonText: { color: "#fff", fontWeight: "700" },
-})
 
 export default ConfirmResetPassword

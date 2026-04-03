@@ -37,7 +37,7 @@ export default function Login({ onLoginSuccess }) {
     return (
         <View style={styles.container}>
             <View style={styles.backgroundLayer}>
-                <Image source={require('../assets/Pelouse.png')} style={{ height:'100%',width:"100%" }}/>
+                <Image source={require('../assets/Pelouse.png')} style={styles.backgroundImage} />
             </View>
 
             <View style={styles.foreground}>

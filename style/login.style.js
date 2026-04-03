@@ -11,6 +11,10 @@ export const styles = StyleSheet.create({
 		...StyleSheet.absoluteFillObject,
 		zIndex: 0,
 	},
+	backgroundImage: {
+		height: "100%",
+		width: "100%",
+	},
 	foreground: {
 		position: "relative",
 		zIndex: 10,
