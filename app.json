@@ -1,7 +1,39 @@
 {
   "expo": {
+    "name": "Clash Of League",
+    "slug": "VotreAppName",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "expo": {
+      "jsEngine": "jsc"
+    },
+    "ios": {
+      "bundleIdentifier": "com.yourcompany.yourappname",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.yourcompany.yourappname"
+    },
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "web": {
       "bundler": "metro"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b4b03b80-92fd-4b6b-b5ea-6c9323c935fb"
+      }
     }
   }
 }

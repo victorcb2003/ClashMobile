@@ -2,6 +2,7 @@ import { View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from './AuthProvider';
 import { styles } from '../style/screenProvider.style';
@@ -50,7 +51,7 @@ function MyTabBar({ state, descriptors, navigation }) {
             <MaterialIcons
               name={iconName}
               size={22}
-              color={isFocused ? '#14532d' : '#64748b'}
+              color={isFocused ? '#14532d' : '#BED3E5'}
             />
           </TouchableOpacity>
         );
@@ -71,7 +72,7 @@ export default function ScreenProvider() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer >
       <Tab.Navigator
         tabBar={(props) => <MyTabBar {...props} />}
         screenOptions={{
