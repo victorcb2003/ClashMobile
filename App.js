@@ -4,21 +4,21 @@ import ScreenProvider from './context/ScreenProvider';
 import { useEffect } from 'react';
 import * as NavigationBar from 'expo-navigation-bar';
 import { StatusBar } from 'expo-status-bar';
+import { Image, StyleSheet } from 'react-native';
 
 export default function App() {
 
   useEffect(() => {
-    NavigationBar.setBackgroundColorAsync('#111d');
     NavigationBar.setButtonStyleAsync('light');
-    NavigationBar.setBehaviorAsync('inset-swipe'); // 🔥 important
   }, []);
 
   return (
     <SafeAreaProvider>
-      <StatusBar style="light" backgroundColor="#111d" />
+      <Image source={require("./assets/Pelouse.png")} style={{ ...StyleSheet.absoluteFillObject, width: "100%", height: "100%" }} />
+      <StatusBar style="light" backgroundColor="#11f0" />
 
       <SafeAreaView
-        style={{ flex: 1, backgroundColor: "#111d" }} // 🔥 PAS transparent
+        style={{ flex: 1, backgroundColor: "#2220" }} 
         edges={['bottom', 'top']}
       >
         <AuthProvider>

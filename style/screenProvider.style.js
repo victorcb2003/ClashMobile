@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    backgroundColor: '#333d',
+    backgroundColor: '#222d',
     zIndex: 99,
     paddingHorizontal: 8,
     alignItems: 'center',

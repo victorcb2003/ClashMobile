@@ -21,8 +21,6 @@ function Home({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Image source={require("../assets/Pelouse.png")} style={styles.bg} />
-
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>Accueil</Text>
         <Text style={styles.subtitle}>Bienvenue {user?.prenom || "joueur"}</Text>

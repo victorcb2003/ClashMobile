@@ -388,7 +388,7 @@ export default function MatchDisplay({ route }) {
 
             <div className="absolute inset-0 z-0 pointer-events-none">
                 <img
-                    src="/Pelouse.png"
+                    IL NE FAUT PAS D IMAGE
                     alt="background"
                     className="fixed w-full h-full object-cover brightness-70"
                 />
