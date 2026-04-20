@@ -55,7 +55,6 @@ function Register({ navigation }) {
         <View style={styles.container}>
             <View style={styles.backgroundLayer}>
                 <Image
-                    source={require("../assets/Pelouse.png")}
                     style={styles.backgroundImage}
                 />
             </View>

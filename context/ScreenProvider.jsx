@@ -1,5 +1,5 @@
-import { View, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { View, TouchableOpacity, ActivityIndicator, Image, StyleSheet } from 'react-native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
@@ -71,14 +71,24 @@ export default function ScreenProvider() {
     )
   }
 
+  const MyTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: 'transparent',
+    },
+  };
+
   return (
-    <NavigationContainer >
+    <NavigationContainer theme={MyTheme}>
       <Tab.Navigator
         tabBar={(props) => <MyTabBar {...props} />}
         screenOptions={{
           swipeEnabled: true,
         }}
+        style={{ backgroundColor: "#0000" }}
       >
+
         {!isAuthenticated ? (
           <>
             <Tab.Screen name="Login" component={Login} />

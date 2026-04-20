@@ -60,7 +60,7 @@ export default function Admin() {
 
   return (
     <View style={styles.container}>
-      <Image source={require("../assets/Pelouse.png")} style={styles.bg} />
+      <Image style={styles.bg} />
       <View style={styles.overlay}>
         <Text style={styles.title}>Administration</Text>
         {error ? <Text style={styles.error}>{error}</Text> : null}

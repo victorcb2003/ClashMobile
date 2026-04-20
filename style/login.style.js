@@ -6,14 +6,17 @@ export const styles = StyleSheet.create({
 		flex: 1,
 		width: "100%",
 		overflow: "hidden",
+		backgroundColor:"#0000"
 	},
 	backgroundLayer: {
 		...StyleSheet.absoluteFillObject,
 		zIndex: 0,
+		backgroundColor:"#0000"
 	},
 	backgroundImage: {
 		height: "100%",
 		width: "100%",
+		backgroundColor:"#0000"
 	},
 	foreground: {
 		position: "relative",
@@ -21,6 +24,7 @@ export const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
+		backgroundColor:"#0000"
 	},
 	card: {
 		width: 360,
@@ -46,6 +50,7 @@ export const styles = StyleSheet.create({
 	fieldGroup: {
 		width: "100%",
 		marginBottom: 16,
+		backgroundColor:"#0000"
 	},
 	label: {
 		fontSize: 16,

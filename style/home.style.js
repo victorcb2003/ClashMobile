@@ -1,8 +1,7 @@
 import { StyleSheet } from "react-native"
 
 export const styles = StyleSheet.create({
-  container: { flex: 1 },
-  bg: { ...StyleSheet.absoluteFillObject, width: "100%", height: "100%" },
+  container: { flex: 1, backgroundColor: "#3ff0" },
   content: { padding: 16 },
   title: { color: "#fff", fontSize: 28, fontWeight: "700" },
   subtitle: { color: "#d1d5db", marginBottom: 14 },
