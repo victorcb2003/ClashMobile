@@ -3,6 +3,7 @@ import { Alert, Pressable, Text, TextInput, View } from "react-native"
 import { changePassword, getUser, updateUser } from "../services/authService"
 import { equipeMe } from "../services/equipeService"
 import { styles } from "../style/profil.style"
+import { useAuth } from '../context/AuthProvider';
 
 function Profil({ navigation }) {
   const [user, setUser] = useState(null)
@@ -12,6 +13,7 @@ function Profil({ navigation }) {
   const [changingPwd, setChangingPwd] = useState(false)
   const [formData, setFormData] = useState({ prenom: "", nom: "", email: "" })
   const [passwordData, setPasswordData] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" })
+  const { authLogout } = useAuth()
 
   const load = async () => {
     try {
@@ -33,6 +35,15 @@ function Profil({ navigation }) {
   useEffect(() => {
     load()
   }, [])
+
+  const handleDisconnect = async () => {
+    try {
+      const res = await authLogout()
+    }
+    catch (err) {
+      console.error(err)
+    }
+  }
 
   const handleUpdateUser = async () => {
     try {
@@ -82,6 +93,14 @@ function Profil({ navigation }) {
         <Pressable style={styles.btn} onPress={() => setEditing((v) => !v)}><Text style={styles.btnText}>Modifier</Text></Pressable>
         <Pressable style={styles.btn} onPress={() => setChangingPwd((v) => !v)}><Text style={styles.btnText}>Mot de passe</Text></Pressable>
       </View>
+      
+      <View style={styles.row}>
+        <Pressable style={styles.supBtn} onPress={() => handleDisconnect((v) => !v)}><Text style={styles.btnText}>Se déconnecter</Text></Pressable>
+      </View>
+        
+      {/* <Pressable style={styles.quickBtn} onPress={() => navigation?.navigate?.("Match")}>
+            <Text style={styles.quickBtnText}>Matchs</Text>
+          </Pressable> */}
 
       {editing && (
         <View style={styles.card}>

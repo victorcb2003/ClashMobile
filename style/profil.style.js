@@ -11,5 +11,6 @@ export const styles = StyleSheet.create({
   row: { flexDirection: "row", marginTop: 12 },
   input: { backgroundColor: "#fff", borderRadius: 8, padding: 10, marginBottom: 8 },
   btn: { backgroundColor: "#166534", borderRadius: 8, padding: 10, alignItems: "center", marginRight: 8 },
+  supBtn: { backgroundColor: "#DE3918", borderRadius: 8, padding: 10, alignItems: "center", marginRight: 8 },
   btnText: { color: "#fff", fontWeight: "700" },
 })
