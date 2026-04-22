@@ -99,10 +99,21 @@ export default function MatchDisplay({ route }) {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Match</Text>
-            <Text style={styles.sub}>{equipe1?.nom || 'Equipe 1'} vs {equipe2?.nom || 'Equipe 2'}</Text>
-            <Text style={styles.score}>{score1} - {score2}</Text>
-            <Text style={styles.sub}>Tournoi: {tournois?.nom || 'Aucun'}</Text>
+            <View style={{ alignItems: "center", marginBottom: 16 }}>
+                <Text style={styles.title}>Match</Text>
+
+                <Text style={styles.sub}>
+                    {equipe1?.nom || 'Equipe 1'} vs {equipe2?.nom || 'Equipe 2'}
+                </Text>
+
+                <Text style={styles.score}>
+                    {score1} - {score2}
+                </Text>
+
+                <Text style={styles.sub}>
+                    {tournois?.nom || 'Aucun tournoi'}
+                </Text>
+            </View>
 
             {canManage && (
                 <View style={styles.card}>
@@ -121,14 +132,14 @@ export default function MatchDisplay({ route }) {
                         keyExtractor={(item) => String(item.id)}
                         renderItem={({ item }) => (
                             <Pressable onPress={() => setJoueurId(String(item.id))} style={[styles.pill, joueurId === String(item.id) && styles.pillSelected]}>
-                                <Text>{item.prenom}</Text>
+                                <Text style={{color: "#fff"}} >{item.prenom}</Text>
                             </Pressable>
                         )}
                     />
                     <TextInput placeholder="Minute" value={minute} onChangeText={setMinute} keyboardType="numeric" style={styles.input} />
                     <View style={styles.typeRow}>
-                        <Pressable style={[styles.pill, typeBut === '0' && styles.pillSelected]} onPress={() => setTypeBut('0')}><Text>Normal</Text></Pressable>
-                        <Pressable style={[styles.pill, typeBut === '1' && styles.pillSelected]} onPress={() => setTypeBut('1')}><Text>Penalty</Text></Pressable>
+                        <Pressable style={[styles.pill, typeBut === '0' && styles.pillSelected]} onPress={() => setTypeBut('0')}><Text style={{color: "#fff"}} >Normal</Text></Pressable>
+                        <Pressable style={[styles.pill, typeBut === '1' && styles.pillSelected]} onPress={() => setTypeBut('1')}><Text style={{color: "#fff"}} >Penalty</Text></Pressable>
                     </View>
                     <Pressable style={styles.btn} onPress={addBut}><Text style={styles.btnText}>Ajouter</Text></Pressable>
                 </View>
