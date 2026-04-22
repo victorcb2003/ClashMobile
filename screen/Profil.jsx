@@ -1,7 +1,3 @@
-/**
- * Profil.jsx — port exact du web Profil
- * Avatar + photo, infos perso, stats matchs, équipe, edit profil, changement mdp
- */
 import { useEffect, useState } from 'react'
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
@@ -13,24 +9,30 @@ import Avatar from '../components/Avatar'
 
 export default function Profil({ navigation }) {
   const { authLogout } = useAuth()
-  const [user, setUser] = useState(null)
+  const [user,   setUser]   = useState(null)
   const [equipe, setEquipe] = useState(null)
   const [matchs, setMatchs] = useState([])
 
   const [editOpen, setEditOpen] = useState(false)
-  const [pwdOpen, setPwdOpen] = useState(false)
-  const [imgOpen, setImgOpen] = useState(false)
+  const [pwdOpen,  setPwdOpen]  = useState(false)
+  const [imgOpen,  setImgOpen]  = useState(false)
 
   const [formData, setFormData] = useState({ prenom: '', nom: '', email: '' })
-  const [pwdData, setPwdData] = useState({ current: '', newPwd: '', confirm: '' })
+  const [pwdData,  setPwdData]  = useState({ current: '', newPwd: '', confirm: '' })
 
   const load = async () => {
     try {
-      const [u, e] = await Promise.all([getUser(), equipeMe()])
+      const u = await getUser()
       const cu = u?.user?.[0] || null
-      setUser(cu); setMatchs(u?.match || []); setEquipe(e?.equipe || null)
+      setUser(cu)
+      setMatchs(u?.match || [])
       setFormData({ prenom: cu?.prenom || '', nom: cu?.nom || '', email: cu?.email || '' })
     } catch (err) { console.error(err) }
+
+    try {
+      const e = await equipeMe()
+      setEquipe(e?.equipe || null)
+    } catch { setEquipe(null) }
   }
 
   useEffect(() => { load() }, [])
@@ -38,17 +40,20 @@ export default function Profil({ navigation }) {
   const handleUpdateUser = async () => {
     try {
       await updateUser({ id: user.id, ...formData })
-      setEditOpen(false); await load()
+      setEditOpen(false)
+      await load()
     } catch { Alert.alert('Profil', 'Erreur de mise à jour') }
   }
 
   const handleChangePwd = async () => {
     if (pwdData.newPwd !== pwdData.confirm) {
-      Alert.alert('Profil', 'Les mots de passe ne correspondent pas'); return
+      Alert.alert('Profil', 'Les mots de passe ne correspondent pas')
+      return
     }
     try {
       await changePassword({ id: user.id, currentPassword: pwdData.current, newPassword: pwdData.newPwd })
-      setPwdOpen(false); setPwdData({ current: '', newPwd: '', confirm: '' })
+      setPwdOpen(false)
+      setPwdData({ current: '', newPwd: '', confirm: '' })
       Alert.alert('Profil', 'Mot de passe modifié ✓')
     } catch { Alert.alert('Profil', 'Erreur lors du changement') }
   }
@@ -60,11 +65,14 @@ export default function Profil({ navigation }) {
     const fd = new FormData()
     fd.append('image', { uri: asset.uri, type: 'image/jpeg', name: 'profil.jpg' })
     await setImageProfil({ id: user.id, imageFile: fd })
-    setImgOpen(false); await load()
+    setImgOpen(false)
+    await load()
   }
 
   const handleDeleteImage = async () => {
-    await deleteImageProfil({ id: user.id }); setImgOpen(false); await load()
+    await deleteImageProfil({ id: user.id })
+    setImgOpen(false)
+    await load()
   }
 
   if (!user) return <View style={s.center}><Text style={{ color: '#fff' }}>Chargement...</Text></View>
@@ -72,7 +80,6 @@ export default function Profil({ navigation }) {
   return (
     <ScrollView style={s.container} contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
 
-      {/* ── Avatar + header ─────────────────────────────── */}
       <View style={s.headerCard}>
         <Pressable onPress={() => setImgOpen(v => !v)} style={s.avatarWrap}>
           <Avatar user={user} size="lg" />
@@ -82,15 +89,11 @@ export default function Profil({ navigation }) {
           <Text style={s.userName}>{user.prenom} {user.nom}</Text>
           <Text style={s.userEmail}>{user.email}</Text>
         </View>
-        <Pressable
-          style={s.editProfileBtn}
-          onPress={() => setEditOpen(v => !v)}
-        >
+        <Pressable style={s.editProfileBtn} onPress={() => setEditOpen(v => !v)}>
           <Text style={s.editProfileText}>Modifier</Text>
         </Pressable>
       </View>
 
-      {/* Image manager */}
       {imgOpen && (
         <View style={s.card}>
           <View style={{ alignItems: 'center', marginBottom: 14 }}>
@@ -104,13 +107,12 @@ export default function Profil({ navigation }) {
               <Text style={s.dangerText}>Supprimer la photo</Text>
             </Pressable>
           )}
-          <Pressable style={s.ghostBtn} onPress={() => setImgOpen(false)}>
+          <Pressable style={[s.ghostBtn, { marginTop: 8 }]} onPress={() => setImgOpen(false)}>
             <Text style={s.ghostText}>Fermer</Text>
           </Pressable>
         </View>
       )}
 
-      {/* ── Edit infos ──────────────────────────────────── */}
       {editOpen && (
         <View style={s.card}>
           <Text style={s.sectionTitle}>Modifier les informations</Text>
@@ -137,41 +139,31 @@ export default function Profil({ navigation }) {
         </View>
       )}
 
-      {/* ── 2-col: Infos + Stats ─────────────────────────── */}
-      <View style={s.twoCol}>
-        {/* Infos perso */}
-        <View style={[s.card, { flex: 1 }]}>
-          <Text style={s.sectionTitle}>Informations</Text>
-          {[['Prénom', user.prenom], ['Nom', user.nom], ['Email', user.email]].map(([l, v]) => (
-            <View key={l} style={{ marginBottom: 8 }}>
-              <Text style={s.infoLabel}>{l}</Text>
-              <Text style={s.infoValue}>{v || '—'}</Text>
-            </View>
-          ))}
-          <Pressable style={[s.greenBtn, { marginTop: 6 }]} onPress={() => setPwdOpen(v => !v)}>
-            <Text style={s.greenText}>Changer le mot de passe</Text>
-          </Pressable>
-        </View>
-
-        {/* Stats */}
-        <View style={[s.card, { flex: 1, alignItems: 'center', justifyContent: 'center' }]}>
-          <Text style={s.sectionTitle}>Statistiques</Text>
-          <View style={s.statBox}>
-            <Text style={s.statNum}>{matchs.length}</Text>
-            <Text style={s.statLabel}>Matchs joués</Text>
+      <View style={s.card}>
+        <Text style={s.sectionTitle}>Informations</Text>
+        {[['Prénom', user.prenom], ['Nom', user.nom], ['Email', user.email]].map(([l, v]) => (
+          <View key={l} style={{ marginBottom: 8 }}>
+            <Text style={s.infoLabel}>{l}</Text>
+            <Text style={s.infoValue}>{v || '—'}</Text>
           </View>
+        ))}
+        <Pressable style={[s.greenBtn, { marginTop: 6 }]} onPress={() => setPwdOpen(v => !v)}>
+          <Text style={s.greenText}>Changer le mot de passe</Text>
+        </Pressable>
+      </View>
+
+      <View style={s.card}>
+        <Text style={s.sectionTitle}>Statistiques</Text>
+        <View style={s.statBox}>
+          <Text style={s.statNum}>{matchs.length}</Text>
+          <Text style={s.statLabel}>Matchs joués</Text>
         </View>
       </View>
 
-      {/* Change password */}
       {pwdOpen && (
         <View style={s.card}>
           <Text style={s.sectionTitle}>Changer le mot de passe</Text>
-          {[
-            ['Actuel', 'current'],
-            ['Nouveau', 'newPwd'],
-            ['Confirmer', 'confirm'],
-          ].map(([label, key]) => (
+          {[['Actuel', 'current'], ['Nouveau', 'newPwd'], ['Confirmer', 'confirm']].map(([label, key]) => (
             <View key={key}>
               <Text style={s.inputLabel}>{label}</Text>
               <TextInput
@@ -195,7 +187,6 @@ export default function Profil({ navigation }) {
         </View>
       )}
 
-      {/* ── Équipe ─────────────────────────────────────── */}
       {equipe && (
         <View style={s.card}>
           <Text style={s.sectionTitle}>
@@ -212,20 +203,20 @@ export default function Profil({ navigation }) {
         </View>
       )}
 
-      {/* ── Déconnexion ─────────────────────────────────── */}
       <View style={s.card}>
         <Pressable style={s.logoutRow} onPress={authLogout}>
           <Ionicons name="log-out-outline" size={20} color="#f87171" />
           <Text style={s.logoutText}>Se déconnecter</Text>
         </Pressable>
       </View>
+
     </ScrollView>
   )
 }
 
 const s = StyleSheet.create({
   container: { flex: 1 },
-  content: { padding: 16, paddingBottom: 80 },
+  content: { padding: 16, paddingBottom: 100 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 
   headerCard: {
@@ -242,7 +233,6 @@ const s = StyleSheet.create({
   editProfileBtn: { backgroundColor: '#15803d', borderRadius: 8, paddingVertical: 6, paddingHorizontal: 14 },
   editProfileText: { color: '#fff', fontWeight: '700', fontSize: 13 },
 
-  twoCol: { flexDirection: 'row', gap: 12, marginBottom: 0 },
   card: { backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', padding: 16, marginBottom: 14 },
   sectionTitle: { color: '#fff', fontSize: 16, fontWeight: '700', marginBottom: 12 },
   inputLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 13, marginBottom: 4 },
@@ -250,7 +240,7 @@ const s = StyleSheet.create({
   infoLabel: { color: 'rgba(255,255,255,0.75)', fontSize: 11 },
   infoValue: { color: '#fff', fontSize: 14 },
 
-  statBox: { alignItems: 'center', marginTop: 8 },
+  statBox: { alignItems: 'center', marginTop: 4 },
   statNum: { color: '#fff', fontSize: 40, fontWeight: '900' },
   statLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 12 },
 
