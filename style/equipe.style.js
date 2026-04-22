@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native"
 
 export const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#0f172a" },
+  container: { flex: 1, padding: 16, backgroundColor: "#0f172a00" },
   title: { color: "#fff", fontSize: 24, fontWeight: "700", marginBottom: 12 },
   card: { backgroundColor: "#1e293b", borderRadius: 10, padding: 12, marginBottom: 12 },
   input: { backgroundColor: "#fff", borderRadius: 8, padding: 10, marginBottom: 10 },

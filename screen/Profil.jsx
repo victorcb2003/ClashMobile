@@ -4,6 +4,7 @@ import { changePassword, getUser, updateUser } from "../services/authService"
 import { equipeMe } from "../services/equipeService"
 import { styles } from "../style/profil.style"
 import { useAuth } from '../context/AuthProvider';
+import Icon from "react-native-vector-icons/Ionicons";
 
 function Profil({ navigation }) {
   const [user, setUser] = useState(null)
@@ -89,38 +90,45 @@ function Profil({ navigation }) {
         ) : null}
       </View>
 
-      <View style={styles.row}>
-        <Pressable style={styles.btn} onPress={() => setEditing((v) => !v)}><Text style={styles.btnText}>Modifier</Text></Pressable>
-        <Pressable style={styles.btn} onPress={() => setChangingPwd((v) => !v)}><Text style={styles.btnText}>Mot de passe</Text></Pressable>
-      </View>
-      
-      <View style={styles.row}>
-        <Pressable style={styles.supBtn} onPress={() => handleDisconnect((v) => !v)}><Text style={styles.btnText}>Se déconnecter</Text></Pressable>
-      </View>
-        
-      {/* <Pressable style={styles.quickBtn} onPress={() => navigation?.navigate?.("Match")}>
-            <Text style={styles.quickBtnText}>Matchs</Text>
-          </Pressable> */}
+      <View style={styles.card}>
+        <Text style={styles.section}>Modifier le profil</Text>
 
-      {editing && (
-        <View style={styles.card}>
-          <Text style={styles.section}>Modifier mes infos</Text>
-          <TextInput style={styles.input} placeholder="Prénom" value={formData.prenom} onChangeText={(v) => setFormData({ ...formData, prenom: v })} />
-          <TextInput style={styles.input} placeholder="Nom" value={formData.nom} onChangeText={(v) => setFormData({ ...formData, nom: v })} />
-          <TextInput style={styles.input} placeholder="Email" value={formData.email} onChangeText={(v) => setFormData({ ...formData, email: v })} />
-          <Pressable style={styles.btn} onPress={handleUpdateUser}><Text style={styles.btnText}>Enregistrer</Text></Pressable>
-        </View>
-      )}
+        <Pressable style={styles.optionRow} onPress={() => setEditing((v) => !v)}>
+          <Icon name="person-outline" size={20} color="#fff" />
+          <Text style={styles.optionText}>Modifier mes informations</Text>
+        </Pressable>
+        {editing && (
+          <View style={styles.card}>
+            <Text style={styles.section}>Modifier mes infos</Text>
+            <TextInput style={styles.input} placeholder="Prénom" value={formData.prenom} onChangeText={(v) => setFormData({ ...formData, prenom: v })} />
+            <TextInput style={styles.input} placeholder="Nom" value={formData.nom} onChangeText={(v) => setFormData({ ...formData, nom: v })} />
+            <TextInput style={styles.input} placeholder="Email" value={formData.email} onChangeText={(v) => setFormData({ ...formData, email: v })} />
+            <Pressable style={styles.btn} onPress={handleUpdateUser}><Text style={styles.btnText}>Enregistrer</Text></Pressable>
+          </View>
+        )}
+        <Pressable style={styles.optionRow} onPress={() => setChangingPwd((v) => !v)}>
+          <Icon name="lock-closed-outline" size={20} color="#fff" />
+          <Text style={styles.optionText}>Changer le mot de passe</Text>
+        </Pressable>
+        {changingPwd && (
+          <View style={styles.card}>
+            <Text style={styles.section}>Changer le mot de passe</Text>
+            <TextInput secureTextEntry style={styles.input} placeholder="Mot de passe actuel" value={passwordData.currentPassword} onChangeText={(v) => setPasswordData({ ...passwordData, currentPassword: v })} />
+            <TextInput secureTextEntry style={styles.input} placeholder="Nouveau mot de passe" value={passwordData.newPassword} onChangeText={(v) => setPasswordData({ ...passwordData, newPassword: v })} />
+            <TextInput secureTextEntry style={styles.input} placeholder="Confirmer" value={passwordData.confirmPassword} onChangeText={(v) => setPasswordData({ ...passwordData, confirmPassword: v })} />
+            <Pressable style={styles.btn} onPress={handleChangePassword}><Text style={styles.btnText}>Confirmer</Text></Pressable>
+          </View>
+        )}
+      </View>
+      <View style={styles.card}>
+        <Pressable style={styles.optionRow} onPress={handleDisconnect}>
+          <Icon name="log-out-outline" size={20} color="#F54927" />
+          <Text style={[styles.optionText, { color: "#F54927" }]}>
+            Se déconnecter
+          </Text>
+        </Pressable>
+      </View>
 
-      {changingPwd && (
-        <View style={styles.card}>
-          <Text style={styles.section}>Changer le mot de passe</Text>
-          <TextInput secureTextEntry style={styles.input} placeholder="Mot de passe actuel" value={passwordData.currentPassword} onChangeText={(v) => setPasswordData({ ...passwordData, currentPassword: v })} />
-          <TextInput secureTextEntry style={styles.input} placeholder="Nouveau mot de passe" value={passwordData.newPassword} onChangeText={(v) => setPasswordData({ ...passwordData, newPassword: v })} />
-          <TextInput secureTextEntry style={styles.input} placeholder="Confirmer" value={passwordData.confirmPassword} onChangeText={(v) => setPasswordData({ ...passwordData, confirmPassword: v })} />
-          <Pressable style={styles.btn} onPress={handleChangePassword}><Text style={styles.btnText}>Confirmer</Text></Pressable>
-        </View>
-      )}
     </View>
   )
 }
