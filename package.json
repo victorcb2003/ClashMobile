@@ -9,12 +9,15 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/vector-icons": "^15.0.3",
     "@react-navigation/material-top-tabs": "^7.4.21",
     "@react-navigation/native": "^7.2.0",
     "axios": "^1.13.6",
+    "axios-cookiejar-support": "^6.0.5",
     "babel-preset-expo": "~54.0.10",
     "expo": "~54.0.33",
     "expo-blur": "~15.0.8",
+    "expo-image-picker": "~17.0.10",
     "expo-navigation-bar": "~5.0.10",
     "expo-status-bar": "~3.0.9",
     "nativewind": "^4.2.2",
@@ -29,7 +32,8 @@
     "react-native-swiper": "^1.6.0",
     "react-native-tab-view": "^4.3.0",
     "react-native-vector-icons": "^10.3.0",
-    "react-native-web": "^0.21.0"
+    "react-native-web": "^0.21.0",
+    "tough-cookie": "^6.0.1"
   },
   "private": true,
   "devDependencies": {

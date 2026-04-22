@@ -20,7 +20,7 @@ export default function App() {
 
       <SafeAreaView
         style={{ flex: 1, backgroundColor: "#2220" }}
-        edges={['bottom', 'top']}
+        edges={['top']}
       >
         <AuthProvider>
           <ScreenProvider />

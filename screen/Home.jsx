@@ -1,62 +1,37 @@
-import { useEffect, useState } from "react"
-import { Image, Pressable, ScrollView, Text, View } from "react-native"
-import { getUser } from "../services/authService"
-import { styles } from "../style/home.style"
+import { useEffect, useState } from 'react'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { getUser } from '../services/authService'
+import CalendarStrip from '../components/Calendar'
+import MatchSummaryCard from '../components/MatchSummaryCard'
+import NewsCard from '../components/NewCards'
 
-function Home({ navigation }) {
-  const [user, setUser] = useState(null)
-  const [matchs, setMatchs] = useState([])
+export default function Home({ navigation }) {
+  const [matches, setMatches] = useState([])
 
   useEffect(() => {
     ;(async () => {
       try {
         const data = await getUser()
-        setUser(data?.user?.[0] || null)
-        setMatchs(data?.match || [])
-      } catch (error) {
-        console.error(error)
-      }
+        setMatches(data?.match || [])
+      } catch (e) { console.error(e) }
     })()
   }, [])
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Accueil</Text>
-        <Text style={styles.subtitle}>Bienvenue {user?.prenom || "joueur"}</Text>
-
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Matchs récents</Text>
-          {matchs.length === 0 ? (
-            <Text style={styles.textMuted}>Aucun match.</Text>
-          ) : (
-            matchs.slice(0, 5).map((m) => (
-              <Pressable
-                key={m.id}
-                style={styles.row}
-                onPress={() => navigation?.navigate?.("MatchDisplay", { id: m.id })}
-              >
-                <Text style={styles.rowTitle}>Match #{m.id}</Text>
-                <Text style={styles.textMuted}>{m.lieu || "Lieu à définir"}</Text>
-              </Pressable>
-            ))
-          )}
-        </View>
-
-        <View style={styles.quickRow}>
-          <Pressable style={styles.quickBtn} onPress={() => navigation?.navigate?.("Tournois")}>
-            <Text style={styles.quickBtnText}>Tournois</Text>
-          </Pressable>
-          <Pressable style={styles.quickBtn} onPress={() => navigation?.navigate?.("Match")}>
-            <Text style={styles.quickBtnText}>Matchs</Text>
-          </Pressable>
-          <Pressable style={styles.quickBtn} onPress={() => navigation?.navigate?.("Equipe")}>
-            <Text style={styles.quickBtnText}>Équipes</Text>
-          </Pressable>
-        </View>
-      </ScrollView>
-    </View>
+    <ScrollView style={s.container} contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+      <CalendarStrip navigation={navigation} />
+      <View style={s.section}>
+        <Text style={s.sectionTitle}>Mes matchs</Text>
+        <MatchSummaryCard matches={matches} navigation={navigation} />
+      </View>
+      <NewsCard />
+    </ScrollView>
   )
 }
 
-export default Home
+const s = StyleSheet.create({
+  container: { flex: 1 },
+  content: { padding: 16, paddingBottom: 100 },
+  section: { marginBottom: 16 },
+  sectionTitle: { color: '#fff', fontSize: 17, fontWeight: '700', marginBottom: 10 },
+})

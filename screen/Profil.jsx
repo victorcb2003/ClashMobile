@@ -1,136 +1,270 @@
-import { useEffect, useState } from "react"
-import { Alert, Pressable, Text, TextInput, View } from "react-native"
-import { changePassword, getUser, updateUser } from "../services/authService"
-import { equipeMe } from "../services/equipeService"
-import { styles } from "../style/profil.style"
-import { useAuth } from '../context/AuthProvider';
-import Icon from "react-native-vector-icons/Ionicons";
+/**
+ * Profil.jsx — port exact du web Profil
+ * Avatar + photo, infos perso, stats matchs, équipe, edit profil, changement mdp
+ */
+import { useEffect, useState } from 'react'
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
+import * as ImagePicker from 'expo-image-picker'
+import { getUser, updateUser, changePassword, setImageProfil, deleteImageProfil } from '../services/authService'
+import { equipeMe } from '../services/equipeService'
+import { useAuth } from '../context/AuthProvider'
+import Avatar from '../components/Avatar'
 
-function Profil({ navigation }) {
+export default function Profil({ navigation }) {
+  const { authLogout } = useAuth()
   const [user, setUser] = useState(null)
   const [equipe, setEquipe] = useState(null)
   const [matchs, setMatchs] = useState([])
-  const [editing, setEditing] = useState(false)
-  const [changingPwd, setChangingPwd] = useState(false)
-  const [formData, setFormData] = useState({ prenom: "", nom: "", email: "" })
-  const [passwordData, setPasswordData] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" })
-  const { authLogout } = useAuth()
+
+  const [editOpen, setEditOpen] = useState(false)
+  const [pwdOpen, setPwdOpen] = useState(false)
+  const [imgOpen, setImgOpen] = useState(false)
+
+  const [formData, setFormData] = useState({ prenom: '', nom: '', email: '' })
+  const [pwdData, setPwdData] = useState({ current: '', newPwd: '', confirm: '' })
 
   const load = async () => {
     try {
       const [u, e] = await Promise.all([getUser(), equipeMe()])
-      const current = u?.user?.[0] || null
-      setUser(current)
-      setMatchs(u?.match || [])
-      setEquipe(e?.equipe || null)
-      setFormData({
-        prenom: current?.prenom || "",
-        nom: current?.nom || "",
-        email: current?.email || "",
-      })
-    } catch (error) {
-      console.error(error)
-    }
+      const cu = u?.user?.[0] || null
+      setUser(cu); setMatchs(u?.match || []); setEquipe(e?.equipe || null)
+      setFormData({ prenom: cu?.prenom || '', nom: cu?.nom || '', email: cu?.email || '' })
+    } catch (err) { console.error(err) }
   }
 
-  useEffect(() => {
-    load()
-  }, [])
-
-  const handleDisconnect = async () => {
-    try {
-      const res = await authLogout()
-    }
-    catch (err) {
-      console.error(err)
-    }
-  }
+  useEffect(() => { load() }, [])
 
   const handleUpdateUser = async () => {
     try {
       await updateUser({ id: user.id, ...formData })
-      setEditing(false)
-      await load()
-    } catch (error) {
-      Alert.alert("Profil", "Erreur de mise à jour")
-    }
+      setEditOpen(false); await load()
+    } catch { Alert.alert('Profil', 'Erreur de mise à jour') }
   }
 
-  const handleChangePassword = async () => {
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      Alert.alert("Profil", "Les mots de passe ne correspondent pas")
-      return
+  const handleChangePwd = async () => {
+    if (pwdData.newPwd !== pwdData.confirm) {
+      Alert.alert('Profil', 'Les mots de passe ne correspondent pas'); return
     }
     try {
-      await changePassword({ id: user.id, currentPassword: passwordData.currentPassword, newPassword: passwordData.newPassword })
-      setChangingPwd(false)
-      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" })
-      Alert.alert("Profil", "Mot de passe modifié")
-    } catch (error) {
-      Alert.alert("Profil", "Erreur lors du changement")
-    }
+      await changePassword({ id: user.id, currentPassword: pwdData.current, newPassword: pwdData.newPwd })
+      setPwdOpen(false); setPwdData({ current: '', newPwd: '', confirm: '' })
+      Alert.alert('Profil', 'Mot de passe modifié ✓')
+    } catch { Alert.alert('Profil', 'Erreur lors du changement') }
   }
 
-  if (!user) return <View style={styles.center}><Text>Chargement...</Text></View>
+  const handlePickImage = async () => {
+    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.8 })
+    if (res.canceled || !res.assets?.[0]) return
+    const asset = res.assets[0]
+    const fd = new FormData()
+    fd.append('image', { uri: asset.uri, type: 'image/jpeg', name: 'profil.jpg' })
+    await setImageProfil({ id: user.id, imageFile: fd })
+    setImgOpen(false); await load()
+  }
+
+  const handleDeleteImage = async () => {
+    await deleteImageProfil({ id: user.id }); setImgOpen(false); await load()
+  }
+
+  if (!user) return <View style={s.center}><Text style={{ color: '#fff' }}>Chargement...</Text></View>
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Profil</Text>
-      <Text style={styles.name}>{user.prenom} {user.nom}</Text>
-      <Text style={styles.sub}>{user.email}</Text>
+    <ScrollView style={s.container} contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
 
-      <View style={styles.card}>
-        <Text style={styles.section}>Statistiques</Text>
-        <Text style={styles.sub}>Matchs joués: {matchs.length}</Text>
-        <Text style={styles.sub}>Équipe: {equipe?.nom || "Aucune"}</Text>
-        {equipe?.id ? (
-          <Pressable style={styles.btn} onPress={() => navigation?.navigate?.("EquipeDisplay", { id: equipe.id })}>
-            <Text style={styles.btnText}>Voir mon équipe</Text>
+      {/* ── Avatar + header ─────────────────────────────── */}
+      <View style={s.headerCard}>
+        <Pressable onPress={() => setImgOpen(v => !v)} style={s.avatarWrap}>
+          <Avatar user={user} size="lg" />
+          <View style={s.cameraBadge}><Ionicons name="camera" size={14} color="#fff" /></View>
+        </Pressable>
+        <View style={s.headerInfo}>
+          <Text style={s.userName}>{user.prenom} {user.nom}</Text>
+          <Text style={s.userEmail}>{user.email}</Text>
+        </View>
+        <Pressable
+          style={s.editProfileBtn}
+          onPress={() => setEditOpen(v => !v)}
+        >
+          <Text style={s.editProfileText}>Modifier</Text>
+        </Pressable>
+      </View>
+
+      {/* Image manager */}
+      {imgOpen && (
+        <View style={s.card}>
+          <View style={{ alignItems: 'center', marginBottom: 14 }}>
+            <Avatar user={user} size="xl" />
+          </View>
+          <Pressable style={s.greenBtn} onPress={handlePickImage}>
+            <Text style={s.greenText}>{user.img_url ? 'Remplacer la photo' : 'Ajouter une photo'}</Text>
           </Pressable>
-        ) : null}
+          {user.img_url && (
+            <Pressable style={[s.dangerBtn, { marginTop: 8 }]} onPress={handleDeleteImage}>
+              <Text style={s.dangerText}>Supprimer la photo</Text>
+            </Pressable>
+          )}
+          <Pressable style={s.ghostBtn} onPress={() => setImgOpen(false)}>
+            <Text style={s.ghostText}>Fermer</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {/* ── Edit infos ──────────────────────────────────── */}
+      {editOpen && (
+        <View style={s.card}>
+          <Text style={s.sectionTitle}>Modifier les informations</Text>
+          {[['Prénom', 'prenom'], ['Nom', 'nom']].map(([label, key]) => (
+            <View key={key}>
+              <Text style={s.inputLabel}>{label}</Text>
+              <TextInput
+                style={s.input}
+                value={formData[key]}
+                onChangeText={v => setFormData(f => ({ ...f, [key]: v }))}
+                placeholder={`${label}...`}
+                placeholderTextColor="#9ca3af"
+              />
+            </View>
+          ))}
+          <View style={s.rowEnd}>
+            <Pressable style={s.ghostBtn} onPress={() => setEditOpen(false)}>
+              <Text style={s.ghostText}>Annuler</Text>
+            </Pressable>
+            <Pressable style={s.greenBtn} onPress={handleUpdateUser}>
+              <Text style={s.greenText}>Confirmer</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
+
+      {/* ── 2-col: Infos + Stats ─────────────────────────── */}
+      <View style={s.twoCol}>
+        {/* Infos perso */}
+        <View style={[s.card, { flex: 1 }]}>
+          <Text style={s.sectionTitle}>Informations</Text>
+          {[['Prénom', user.prenom], ['Nom', user.nom], ['Email', user.email]].map(([l, v]) => (
+            <View key={l} style={{ marginBottom: 8 }}>
+              <Text style={s.infoLabel}>{l}</Text>
+              <Text style={s.infoValue}>{v || '—'}</Text>
+            </View>
+          ))}
+          <Pressable style={[s.greenBtn, { marginTop: 6 }]} onPress={() => setPwdOpen(v => !v)}>
+            <Text style={s.greenText}>Changer le mot de passe</Text>
+          </Pressable>
+        </View>
+
+        {/* Stats */}
+        <View style={[s.card, { flex: 1, alignItems: 'center', justifyContent: 'center' }]}>
+          <Text style={s.sectionTitle}>Statistiques</Text>
+          <View style={s.statBox}>
+            <Text style={s.statNum}>{matchs.length}</Text>
+            <Text style={s.statLabel}>Matchs joués</Text>
+          </View>
+        </View>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.section}>Modifier le profil</Text>
+      {/* Change password */}
+      {pwdOpen && (
+        <View style={s.card}>
+          <Text style={s.sectionTitle}>Changer le mot de passe</Text>
+          {[
+            ['Actuel', 'current'],
+            ['Nouveau', 'newPwd'],
+            ['Confirmer', 'confirm'],
+          ].map(([label, key]) => (
+            <View key={key}>
+              <Text style={s.inputLabel}>{label}</Text>
+              <TextInput
+                secureTextEntry
+                style={s.input}
+                value={pwdData[key]}
+                onChangeText={v => setPwdData(p => ({ ...p, [key]: v }))}
+                placeholder="••••••••"
+                placeholderTextColor="#9ca3af"
+              />
+            </View>
+          ))}
+          <View style={s.rowEnd}>
+            <Pressable style={s.ghostBtn} onPress={() => setPwdOpen(false)}>
+              <Text style={s.ghostText}>Annuler</Text>
+            </Pressable>
+            <Pressable style={s.greenBtn} onPress={handleChangePwd}>
+              <Text style={s.greenText}>Confirmer</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
 
-        <Pressable style={styles.optionRow} onPress={() => setEditing((v) => !v)}>
-          <Icon name="person-outline" size={20} color="#fff" />
-          <Text style={styles.optionText}>Modifier mes informations</Text>
-        </Pressable>
-        {editing && (
-          <View style={styles.card}>
-            <Text style={styles.section}>Modifier mes infos</Text>
-            <TextInput style={styles.input} placeholder="Prénom" value={formData.prenom} onChangeText={(v) => setFormData({ ...formData, prenom: v })} />
-            <TextInput style={styles.input} placeholder="Nom" value={formData.nom} onChangeText={(v) => setFormData({ ...formData, nom: v })} />
-            <TextInput style={styles.input} placeholder="Email" value={formData.email} onChangeText={(v) => setFormData({ ...formData, email: v })} />
-            <Pressable style={styles.btn} onPress={handleUpdateUser}><Text style={styles.btnText}>Enregistrer</Text></Pressable>
-          </View>
-        )}
-        <Pressable style={styles.optionRow} onPress={() => setChangingPwd((v) => !v)}>
-          <Icon name="lock-closed-outline" size={20} color="#fff" />
-          <Text style={styles.optionText}>Changer le mot de passe</Text>
-        </Pressable>
-        {changingPwd && (
-          <View style={styles.card}>
-            <Text style={styles.section}>Changer le mot de passe</Text>
-            <TextInput secureTextEntry style={styles.input} placeholder="Mot de passe actuel" value={passwordData.currentPassword} onChangeText={(v) => setPasswordData({ ...passwordData, currentPassword: v })} />
-            <TextInput secureTextEntry style={styles.input} placeholder="Nouveau mot de passe" value={passwordData.newPassword} onChangeText={(v) => setPasswordData({ ...passwordData, newPassword: v })} />
-            <TextInput secureTextEntry style={styles.input} placeholder="Confirmer" value={passwordData.confirmPassword} onChangeText={(v) => setPasswordData({ ...passwordData, confirmPassword: v })} />
-            <Pressable style={styles.btn} onPress={handleChangePassword}><Text style={styles.btnText}>Confirmer</Text></Pressable>
-          </View>
-        )}
-      </View>
-      <View style={styles.card}>
-        <Pressable style={styles.optionRow} onPress={handleDisconnect}>
-          <Icon name="log-out-outline" size={20} color="#F54927" />
-          <Text style={[styles.optionText, { color: "#F54927" }]}>
-            Se déconnecter
+      {/* ── Équipe ─────────────────────────────────────── */}
+      {equipe && (
+        <View style={s.card}>
+          <Text style={s.sectionTitle}>
+            {user.Pending_Equipe != null ? 'Demande en attente :' : 'Équipe :'}
           </Text>
+          <Pressable
+            style={s.equipeRow}
+            onPress={() => navigation?.navigate?.('EquipeDisplay', { id: equipe.id })}
+          >
+            <Avatar equipe={equipe} size="sm" />
+            <Text style={s.equipeName}>{equipe.nom}</Text>
+            <Ionicons name="chevron-forward" size={18} color="rgba(255,255,255,0.4)" />
+          </Pressable>
+        </View>
+      )}
+
+      {/* ── Déconnexion ─────────────────────────────────── */}
+      <View style={s.card}>
+        <Pressable style={s.logoutRow} onPress={authLogout}>
+          <Ionicons name="log-out-outline" size={20} color="#f87171" />
+          <Text style={s.logoutText}>Se déconnecter</Text>
         </Pressable>
       </View>
-
-    </View>
+    </ScrollView>
   )
 }
 
-export default Profil
+const s = StyleSheet.create({
+  container: { flex: 1 },
+  content: { padding: 16, paddingBottom: 80 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+
+  headerCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 14,
+    backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 16,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
+    padding: 20, marginBottom: 14,
+  },
+  avatarWrap: { position: 'relative' },
+  cameraBadge: { position: 'absolute', bottom: 0, right: 0, backgroundColor: '#16a34a', borderRadius: 10, padding: 4 },
+  headerInfo: { flex: 1 },
+  userName: { color: '#fff', fontSize: 20, fontWeight: '800' },
+  userEmail: { color: 'rgba(255,255,255,0.6)', fontSize: 13 },
+  editProfileBtn: { backgroundColor: '#15803d', borderRadius: 8, paddingVertical: 6, paddingHorizontal: 14 },
+  editProfileText: { color: '#fff', fontWeight: '700', fontSize: 13 },
+
+  twoCol: { flexDirection: 'row', gap: 12, marginBottom: 0 },
+  card: { backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', padding: 16, marginBottom: 14 },
+  sectionTitle: { color: '#fff', fontSize: 16, fontWeight: '700', marginBottom: 12 },
+  inputLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 13, marginBottom: 4 },
+  input: { backgroundColor: '#fff', borderRadius: 8, padding: 10, color: '#111', marginBottom: 12 },
+  infoLabel: { color: 'rgba(255,255,255,0.75)', fontSize: 11 },
+  infoValue: { color: '#fff', fontSize: 14 },
+
+  statBox: { alignItems: 'center', marginTop: 8 },
+  statNum: { color: '#fff', fontSize: 40, fontWeight: '900' },
+  statLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 12 },
+
+  equipeRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  equipeName: { color: '#fff', fontWeight: '600', flex: 1 },
+
+  rowEnd: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10, marginTop: 4 },
+  greenBtn: { backgroundColor: '#15803d', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 16, alignItems: 'center' },
+  greenText: { color: '#fff', fontWeight: '700' },
+  dangerBtn: { backgroundColor: '#7f1d1d', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 16, alignItems: 'center' },
+  dangerText: { color: '#fca5a5', fontWeight: '700' },
+  ghostBtn: { borderWidth: 1, borderColor: '#475569', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 16, alignItems: 'center' },
+  ghostText: { color: '#94a3b8' },
+
+  logoutRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  logoutText: { color: '#f87171', fontSize: 15, fontWeight: '600' },
+})
